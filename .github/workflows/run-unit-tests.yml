@@ -3,7 +3,7 @@ name: Run Java Unit Tests
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   test:
