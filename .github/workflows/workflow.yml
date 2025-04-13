@@ -41,3 +41,4 @@ jobs:
       - name: Build and push the image
         run: |
           docker build -t ghcr.io/p532-carter51/coffee-order:latest --file Dockerfile .  
+          docker push ghcr.io/p532-carter51/coffee-order:latest
