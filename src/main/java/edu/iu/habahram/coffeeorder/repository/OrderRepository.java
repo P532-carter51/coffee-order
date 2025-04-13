@@ -5,13 +5,30 @@ import org.springframework.stereotype.Repository;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
 public class OrderRepository {
 
     private static final String DATABASE_NAME = "db.txt";
-    private static final AtomicInteger receiptCounter = new AtomicInteger(0);
+    private static final AtomicInteger receiptCounter = new AtomicInteger(initializeCounter());
+    private static int initializeCounter() {
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(DATABASE_NAME));
+            if (!lines.isEmpty()) {
+                String lastLine = lines.get(lines.size() - 1);
+                String[] parts = lastLine.split(",");
+                return Integer.parseInt(parts[0].trim());
+            }
+        } catch (IOException | NumberFormatException e) {
+            System.err.println("Failed to initialize receipt counter: " + e.getMessage());
+        }
+        return 0;
+    }
+
     public Receipt add(OrderData order) throws Exception {
         Beverage beverage = null;
         switch (order.beverage().toLowerCase()) {
