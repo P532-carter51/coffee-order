@@ -1,0 +1,41 @@
+name: Run Java Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run JUnit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Download JUnit 5
+        run: |
+          mkdir -p lib
+          curl -L -o lib/junit-jupiter-api-5.9.3.jar https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-api/5.9.3/junit-jupiter-api-5.9.3.jar
+          curl -L -o lib/junit-jupiter-engine-5.9.3.jar https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-engine/5.9.3/junit-jupiter-engine-5.9.3.jar
+          curl -L -o lib/junit-platform-console-standalone-1.9.3.jar https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.9.3/junit-platform-console-standalone-1.9.3.jar
+          ls -lh lib
+
+      - name: Compile Java Test Files
+        run: |
+          mkdir -p out
+          javac -cp "lib/junit-platform-console-standalone-1.9.3.jar:lib/junit-jupiter-api-5.9.3.jar:lib/junit-jupiter-engine-5.9.3.jar" $(find src -name "*.java") $(find test -name "*.java") -d out
+
+      - name: Debug Compiled Files
+        run: ls -R out
+
+      - name: Run JUnit Tests
+        run: |
+          java -cp "out:lib/junit-platform-console-standalone-1.9.3.jar:lib/junit-jupiter-api-5.9.3.jar:lib/junit-jupiter-engine-5.9.3.jar" org.junit.platform.console.ConsoleLauncher --select-package edu.iu.habahram.coffeeorder
